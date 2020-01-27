@@ -12,7 +12,7 @@ import com.booking.replication.augmenter.model.event.QueryAugmentedEventDataType
 import com.booking.replication.augmenter.model.event.RowEventMetadata;
 import com.booking.replication.augmenter.model.event.UpdateRowsAugmentedEventData;
 import com.booking.replication.augmenter.model.event.WriteRowsAugmentedEventData;
-import com.booking.replication.augmenter.model.format.EventDeserializer;
+import com.booking.replication.augmenter.model.format.BinlogEventDeserializer;
 import com.booking.replication.augmenter.model.row.AugmentedRow;
 import com.booking.replication.augmenter.model.schema.ColumnSchema;
 import com.booking.replication.augmenter.model.schema.FullTableName;
@@ -35,13 +35,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class EventDataPresenterAvro {
-    private static final Logger LOG = LogManager.getLogger(EventDataPresenterAvro.class);
+public class AvroManager {
+    private static final Logger LOG = LogManager.getLogger(AvroManager.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final boolean CONVERT_BIN_TO_HEX = true;
-    private static final boolean ADD_META_FILEDS = true;
+    private static final boolean ADD_META_FIELDS = true;
 
     private Collection<ColumnSchema> columns;
     private Collection<AugmentedRow> rows;
@@ -53,7 +53,7 @@ public class EventDataPresenterAvro {
 
     private boolean isCompatibleSchemaChange;
 
-    public EventDataPresenterAvro(AugmentedEvent event) {
+    public AvroManager(AugmentedEvent event) {
         this.init(event.getHeader(), event.getData());
     }
 
@@ -107,13 +107,13 @@ public class EventDataPresenterAvro {
 
     }
 
-    public List<GenericRecord> convertAugumentedEventDataToAvro() throws IOException {
+    public List<GenericRecord> convertAugmentedEventDataToAvro() throws IOException {
         if (this.skipRow) {
             return new ArrayList<>();
         }
 
         try {
-            Schema avroSchema = createAvroSchema(ADD_META_FILEDS, CONVERT_BIN_TO_HEX, this.eventTable, this.columns);
+            Schema avroSchema = createAvroSchema(ADD_META_FIELDS, CONVERT_BIN_TO_HEX, this.eventTable, this.columns);
             if (Objects.equals(this.eventType, "ddl")) {
                 final GenericRecord rec = new DDL(
                         this.sql,
@@ -126,13 +126,13 @@ public class EventDataPresenterAvro {
             for (AugmentedRow row : rows) {
                 final GenericRecord rec = new GenericData.Record(avroSchema);
 
-                String key = (row.getEventType() == AugmentedEventType.UPDATE) ? EventDeserializer.Constants.VALUE_AFTER : null ;
+                String key = (row.getEventType() == AugmentedEventType.UPDATE) ? BinlogEventDeserializer.Constants.VALUE_AFTER : null ;
 
                 for (String column : row.getValues().keySet()) {
                     rec.put(column, row.getValueAsString(column, key));
                 }
 
-                if (ADD_META_FILEDS) {
+                if (ADD_META_FIELDS) {
                     rec.put("__timestamp", header.getTimestamp());
                     int delete = Objects.equals(this.eventType, "delete") ? 1 : 0;
                     rec.put("__is_deleted", delete);
@@ -154,12 +154,10 @@ public class EventDataPresenterAvro {
 
         final SchemaBuilder.FieldAssembler<Schema> builder = SchemaBuilder.record(tableName).namespace(eventTable.getDb()).fields();
         /**
-         * Some missing Avro types - Decimal, Date types. May need some additional work.
+         * TODO: Add support for missing Avro types - Decimal, Date,...
          */
         for (ColumnSchema col : columns) {
-
             String columnName = col.getName();
-
             String colType = col.getColumnType();
             if (colType.startsWith("boolean")) {
 

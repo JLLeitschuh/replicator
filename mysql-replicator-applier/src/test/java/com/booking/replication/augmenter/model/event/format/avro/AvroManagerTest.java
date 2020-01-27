@@ -11,10 +11,10 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class EventDataPresenterAvroTest {
+public class AvroManagerTest {
     @Test
     public void testDefaultValuesInGeneratedAvroSchema() throws Exception {
-        EventDataPresenterAvro dataPresenter = new EventDataPresenterAvro(new AugmentedEvent());
+        AvroManager dataPresenter = new AvroManager(new AugmentedEvent());
         ArrayList<ColumnSchema> columns = new ArrayList<>();
 
         columns.add(new ColumnSchema("col1", DataType.INT, "int(11)", true, "", ""));

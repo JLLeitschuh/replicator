@@ -3,7 +3,7 @@ package com.booking.replication.augmenter;
 import com.booking.replication.augmenter.model.event.AugmentedEventType;
 import com.booking.replication.augmenter.model.event.QueryAugmentedEventDataOperationType;
 import com.booking.replication.augmenter.model.event.QueryAugmentedEventDataType;
-import com.booking.replication.augmenter.model.format.EventDeserializer;
+import com.booking.replication.augmenter.model.format.BinlogEventDeserializer;
 import com.booking.replication.augmenter.model.row.AugmentedRow;
 import com.booking.replication.augmenter.model.row.RowBeforeAfter;
 import com.booking.replication.augmenter.model.schema.ColumnSchema;
@@ -888,7 +888,7 @@ public class AugmenterContext implements Closeable {
     ) {
         Map<String, Object> deserializeCellValues ;
         try {
-            deserializeCellValues = EventDeserializer.getDeserializeCellValues(eventType, columnSchemas, includedColumns, row, cache);
+            deserializeCellValues = BinlogEventDeserializer.getDeserializeCellValues(eventType, columnSchemas, includedColumns, row, cache);
         } catch (Exception e) {
             LOG.error("Error while deserialize row: EventType: " + eventType + " table: " + this.getEventTableFromSchemaCache() + ", row: " + Arrays.toString(row.getAfter().get()), e);
             throw e;

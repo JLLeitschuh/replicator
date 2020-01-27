@@ -8,7 +8,7 @@ public final class VersionedPipelines {
             "harisekhon/hbase-dev:1.3",
             "wurstmeister/kafka:2.11-1.1.1",
             "zookeeper:latest",
-             "confluentinc/cp-schema-registry:4.0.1"
+            "confluentinc/cp-schema-registry:4.0.1"
      );
 
      public static final TagCombo[] versionCombos = {

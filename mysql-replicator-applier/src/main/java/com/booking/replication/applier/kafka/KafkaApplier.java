@@ -42,8 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class KafkaApplier implements Applier {
     private static final Logger LOG = LogManager.getLogger(KafkaApplier.class);
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static  ObjectMapper MAPPER;
 
     private final String dataFormat;
 
@@ -82,6 +81,12 @@ public class KafkaApplier implements Applier {
     private final AtomicReference<AugmentedEvent> lastEventSent = new AtomicReference<>(null);
 
     public KafkaApplier(Map<String, Object> configuration) {
+
+        try {
+            MAPPER = new ObjectMapper();
+        } catch (NullPointerException n) {
+            n.printStackTrace();
+        }
 
         Object topic = configuration.get(Configuration.TOPIC);
 

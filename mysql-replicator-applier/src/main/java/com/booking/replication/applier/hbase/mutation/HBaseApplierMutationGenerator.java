@@ -6,7 +6,7 @@ import com.booking.replication.applier.hbase.schema.HBaseRowKeyMapper;
 import com.booking.replication.applier.validation.ValidationService;
 import com.booking.replication.augmenter.model.AugmenterModel;
 import com.booking.replication.augmenter.model.event.AugmentedEventType;
-import com.booking.replication.augmenter.model.format.EventDeserializer;
+import com.booking.replication.augmenter.model.format.BinlogEventDeserializer;
 import com.booking.replication.augmenter.model.row.AugmentedRow;
 import com.booking.replication.commons.metrics.Metrics;
 import org.apache.hadoop.hbase.client.Put;
@@ -189,8 +189,8 @@ public class HBaseApplierMutationGenerator {
 
                 for (String columnName : augmentedRow.getValues().keySet()) {
 
-                    String valueBefore = augmentedRow.getValueAsString(columnName, EventDeserializer.Constants.VALUE_BEFORE);
-                    String valueAfter  = augmentedRow.getValueAsString(columnName, EventDeserializer.Constants.VALUE_AFTER);
+                    String valueBefore = augmentedRow.getValueAsString(columnName, BinlogEventDeserializer.Constants.VALUE_BEFORE);
+                    String valueAfter  = augmentedRow.getValueAsString(columnName, BinlogEventDeserializer.Constants.VALUE_AFTER);
 
                     if ((valueAfter == null) && (valueBefore == null)) {
                         // no change, skip;
@@ -348,7 +348,7 @@ public class HBaseApplierMutationGenerator {
         String keys  = row.getPrimaryKeyColumns().stream()
                 .map( column -> {
                     try {
-                        String value = row.getValueAsString(column, AugmentedEventType.UPDATE == eventType ? EventDeserializer.Constants.VALUE_AFTER : null);
+                        String value = row.getValueAsString(column, AugmentedEventType.UPDATE == eventType ? BinlogEventDeserializer.Constants.VALUE_AFTER : null);
                         return URLEncoder.encode(column,"UTF-8") + "=" + URLEncoder.encode(value,"UTF-8");
                     } catch (UnsupportedEncodingException e) {
 

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EventDeserializer {
+public class BinlogEventDeserializer {
 
     public interface Constants {
         String VALUE_BEFORE = "b";

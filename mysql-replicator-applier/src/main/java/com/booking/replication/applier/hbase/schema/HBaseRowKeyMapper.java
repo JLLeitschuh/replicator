@@ -1,6 +1,6 @@
 package com.booking.replication.applier.hbase.schema;
 
-import com.booking.replication.augmenter.model.format.EventDeserializer;
+import com.booking.replication.augmenter.model.format.BinlogEventDeserializer;
 import com.booking.replication.augmenter.model.row.AugmentedRow;
 import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
@@ -11,7 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HBaseRowKeyMapper {
@@ -37,7 +36,7 @@ public class HBaseRowKeyMapper {
                     break;
                 }
                 case UPDATE: {
-                    pkColumnValues.add(row.getValueAsString(pkColumnName, EventDeserializer.Constants.VALUE_AFTER));
+                    pkColumnValues.add(row.getValueAsString(pkColumnName, BinlogEventDeserializer.Constants.VALUE_AFTER));
                     break;
                 }
                 default:
